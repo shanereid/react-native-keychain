@@ -334,7 +334,16 @@ RCT_EXPORT_METHOD(getGenericPasswordForOptions:(NSDictionary *)options resolver:
 
   // Found
   NSString *username = (NSString *) [found objectForKey:(__bridge id)(kSecAttrAccount)];
-  NSString *password = [[NSString alloc] initWithData:[found objectForKey:(__bridge id)(kSecValueData)] encoding:NSUTF8StringEncoding];
+  NSData *data = [found objectForKey:(__bridge id)(kSecValueData)];
+  NSDictionary *dictData = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+  NSString *password;
+  
+  if(dictData && dictData[@"id"]) {
+    password = dictData[@"id"];
+  } else {
+    password = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+  }
+
 
   return resolve(@{
     @"service": service,
